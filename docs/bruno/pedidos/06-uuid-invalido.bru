@@ -1,0 +1,29 @@
+meta {
+  name: 06 - Criar pedido - UUID inválido
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/orders
+  body: json
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "id": "123",
+    "product": "Notebook",
+    "quantity": 1,
+    "creationDate": "2026-09-11T20:05:00"
+  }
+}
+
+tests {
+  test("Status deve ser 400", function() {
+    expect(res.status).to.equal(400);
+  });
+}

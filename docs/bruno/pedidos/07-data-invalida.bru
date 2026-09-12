@@ -1,0 +1,29 @@
+meta {
+  name: 07 - Criar pedido - data inválida
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/orders
+  body: json
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440005",
+    "product": "Notebook",
+    "quantity": 1,
+    "creationDate": "data-invalida"
+  }
+}
+
+tests {
+  test("Status deve ser 400", function() {
+    expect(res.status).to.equal(400);
+  });
+}
