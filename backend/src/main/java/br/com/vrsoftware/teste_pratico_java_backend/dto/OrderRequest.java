@@ -14,6 +14,7 @@ public record OrderRequest(
         @NotNull(message = "Quantidade é obrigatória")
         @Min(value = 1, message = "Quantidade deve ser maior que zero")
         Integer quantity,
+        @NotNull(message = "Data de criação é obrigatória")
         LocalDateTime creationDate
 ) {
 }
