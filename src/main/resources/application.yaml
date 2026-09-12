@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: teste-pratico-java-backend
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: VR
+    password: software
+    listener:
+      simple:
+        acknowledge-mode: manual
+
+app:
+  rabbitmq:
+    queue: pedidos.entrada.carlos
+    dlq: pedidos.entrada.carlos.dlq
+    dlx: pedidos.entrada.carlos.dlx
+    success-queue: pedidos.status.sucesso.carlos
+    failure-queue: pedidos.status.falha.carlos
