@@ -1,0 +1,29 @@
+meta {
+  name: 04 - Criar pedido - product vazio
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/orders
+  body: json
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440003",
+    "product": "",
+    "quantity": 1,
+    "creationDate": "2026-09-11T19:55:00"
+  }
+}
+
+tests {
+  test("Status deve ser 400", function() {
+    expect(res.status).to.equal(400);
+  });
+}

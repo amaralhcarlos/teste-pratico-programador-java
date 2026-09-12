@@ -1,0 +1,33 @@
+meta {
+  name: 01 - Criar pedido - válido
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/orders
+  body: json
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "product": "Notebook Dell Inspiron",
+    "quantity": 1,
+    "creationDate": "2026-09-11T19:30:00"
+  }
+}
+
+tests {
+  test("Status deve ser 202", function() {
+    expect(res.status).to.equal(202);
+  });
+
+  test("Response deve conter o id", function() {
+    expect(res.body.id).to.equal("550e8400-e29b-41d4-a716-446655440000");
+  });
+}

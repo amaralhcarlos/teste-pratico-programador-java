@@ -1,0 +1,29 @@
+meta {
+  name: 03 - Criar pedido - quantity negativa
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/orders
+  body: json
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440002",
+    "product": "Mouse",
+    "quantity": -1,
+    "creationDate": "2026-09-11T19:50:00"
+  }
+}
+
+tests {
+  test("Status deve ser 400", function() {
+    expect(res.status).to.equal(400);
+  });
+}
