@@ -2,7 +2,7 @@ package br.com.vrsoftware.teste_pratico_java_backend.messaging;
 
 import br.com.vrsoftware.teste_pratico_java_backend.domain.Order;
 import br.com.vrsoftware.teste_pratico_java_backend.domain.OrderStatus;
-import br.com.vrsoftware.teste_pratico_java_backend.dto.StatusPedido;
+import br.com.vrsoftware.teste_pratico_java_backend.dto.OrderStatusResponse;
 import br.com.vrsoftware.teste_pratico_java_backend.exception.OrderProcessingException;
 import br.com.vrsoftware.teste_pratico_java_backend.service.OrderStatusStore;
 import com.rabbitmq.client.Channel;
@@ -22,9 +22,9 @@ public class OrderConsumer {
 
     private static final Logger log = LogManager.getLogger(OrderConsumer.class);
 
-    private static final double FAILURE_PROBABILITY = 0.2;
-    private static final long MIN_PROCESSING_MILLIS = 1000L;
-    private static final long MAX_PROCESSING_MILLIS = 3000L;
+    private double failureProbability = 0.2;
+    private long minProcessingMillis = 1000L;
+    private long maxProcessingMillis = 3000L;
 
     private final OrderStatusStore statusStore;
     private final OrderStatusPublisher statusPublisher;
@@ -40,49 +40,49 @@ public class OrderConsumer {
                         @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag) throws IOException {
 
         UUID orderId = order.getId();
-        log.info("Pedido recebido: {}", orderId);
+        log.info("Order received: {}", orderId);
 
-        statusStore.update(orderId, OrderStatus.PROCESSANDO);
-        log.info("Iniciando processamento do pedido: {}", orderId);
+        statusStore.update(orderId, OrderStatus.PROCESSING);
+        log.info("Starting order processing: {}", orderId);
 
         try {
             simulateProcessing(orderId);
 
-            statusStore.update(orderId, OrderStatus.SUCESSO);
+            statusStore.update(orderId, OrderStatus.SUCCESS);
 
             channel.basicAck(deliveryTag, false);
 
-            statusPublisher.publishSuccess(StatusPedido.sucesso(orderId));
-            log.info("Pedido processado com sucesso: {}", orderId);
-            log.info("Status de sucesso publicado: {}", orderId);
+            statusPublisher.publishSuccess(OrderStatusResponse.success(orderId));
+            log.info("Order processed successfully: {}", orderId);
+            log.info("Success status published: {}", orderId);
 
         } catch (OrderProcessingException ex) {
-            log.error("Falha ao processar pedido: {} | motivo={}", orderId, ex.getMessage());
+            log.error("Failed to process order: {} | reason={}", orderId, ex.getMessage());
 
-            statusStore.update(orderId, OrderStatus.FALHA);
+            statusStore.update(orderId, OrderStatus.FAILURE);
 
-            statusPublisher.publishFailure(StatusPedido.falha(orderId, ex.getMessage()));
-            log.info("Status de falha publicado: {}", orderId);
+            statusPublisher.publishFailure(OrderStatusResponse.failure(orderId, ex.getMessage()));
+            log.info("Failure status published: {}", orderId);
 
             channel.basicNack(deliveryTag, false, false);
-            log.warn("Rejeitando pedido e encaminhando para DLQ: {}", orderId);
+            log.warn("Rejecting order and forwarding to DLQ: {}", orderId);
 
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
-            log.error("Processamento do pedido {} interrompido", orderId, ex);
+            log.error("Processing of order {} interrupted", orderId, ex);
             channel.basicNack(deliveryTag, false, false);
         }
     }
 
     private void simulateProcessing(UUID orderId) throws InterruptedException {
         long delayMillis = ThreadLocalRandom.current()
-                .nextLong(MIN_PROCESSING_MILLIS, MAX_PROCESSING_MILLIS + 1);
+                .nextLong(minProcessingMillis, maxProcessingMillis + 1);
 
-        log.info("Processando pedido: {} | tempoProcessamentoMs={}", orderId, delayMillis);
+        log.info("Processing order: {} | processingTimeMs={}", orderId, delayMillis);
         Thread.sleep(delayMillis);
 
         double chance = ThreadLocalRandom.current().nextDouble();
-        if (chance < FAILURE_PROBABILITY) {
+        if (chance < failureProbability) {
             throw new OrderProcessingException(
                     "Falha simulada no processamento do pedido " + orderId);
         }

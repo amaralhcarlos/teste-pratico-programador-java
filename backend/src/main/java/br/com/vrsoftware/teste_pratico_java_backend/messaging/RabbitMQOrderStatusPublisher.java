@@ -1,6 +1,6 @@
 package br.com.vrsoftware.teste_pratico_java_backend.messaging;
 
-import br.com.vrsoftware.teste_pratico_java_backend.dto.StatusPedido;
+import br.com.vrsoftware.teste_pratico_java_backend.dto.OrderStatusResponse;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -21,12 +21,12 @@ public class RabbitMQOrderStatusPublisher implements OrderStatusPublisher {
     }
 
     @Override
-    public void publishSuccess(StatusPedido statusPedido) {
-        rabbitTemplate.convertAndSend(successQueue, statusPedido);
+    public void publishSuccess(OrderStatusResponse orderStatusResponse) {
+        rabbitTemplate.convertAndSend(successQueue, orderStatusResponse);
     }
 
     @Override
-    public void publishFailure(StatusPedido statusPedido) {
-        rabbitTemplate.convertAndSend(failureQueue, statusPedido);
+    public void publishFailure(OrderStatusResponse orderStatusResponse) {
+        rabbitTemplate.convertAndSend(failureQueue, orderStatusResponse);
     }
 }

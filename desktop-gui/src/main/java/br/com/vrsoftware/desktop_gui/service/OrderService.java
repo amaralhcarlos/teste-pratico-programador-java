@@ -4,7 +4,6 @@ import br.com.vrsoftware.desktop_gui.config.ApiConfig;
 import br.com.vrsoftware.desktop_gui.model.Order;
 import br.com.vrsoftware.desktop_gui.model.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -114,8 +113,8 @@ public class OrderService {
             return OrderStatus.SENT_AWAITING_PROCESSING;
         }
         return switch (backendStatus) {
-            case "SUCESSO" -> OrderStatus.SUCCESS;
-            case "FALHA" -> OrderStatus.FAILURE;
+            case "SUCCESS" -> OrderStatus.SUCCESS;
+            case "FAILURE" -> OrderStatus.FAILURE;
             default -> OrderStatus.SENT_AWAITING_PROCESSING;
         };
     }
@@ -149,6 +148,6 @@ public class OrderService {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    private record StatusQueryResponse(@JsonProperty("idPedido") UUID orderId, String status) {
+    private record StatusQueryResponse(UUID orderId, String status) {
     }
 }
