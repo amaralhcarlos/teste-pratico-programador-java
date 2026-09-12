@@ -42,7 +42,7 @@ public class OrderService {
 
         publisher.publish(order);
 
-        statusStore.update(order.getId(), OrderStatus.RECEBIDO);
+        statusStore.update(order.getId(), OrderStatus.RECEIVED);
 
         log.info(
                 "Order successfully published to RabbitMQ | orderId={}",
